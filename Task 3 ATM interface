@@ -1,145 +1,170 @@
 import java.io.*;
 import java.util.*;
-import java.sql.Timestamp;
-import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 public class MyAtm{
-  Scanner input=new Scanner(System.in);
-  Timestamp ctime=new Timestamp(System.currentTimeMillis());
-  String user;
-  int balance=0;
-  String str;
-  public void functionalities() {
-    System.out.println("Select any option");
-    System.out.println("1.With draw amount");
-    System.out.println("2.Deposit amount");
-    System.out.println("3.Transfer amount");
-    System.out.println("4.Balance amount");
-    System.out.println("5.Quit");
-    System.out.println("Enter your choice ");
-    int choose=input.nextInt();
-    MyAtm usr=new MyAtm();
-    switch(choose) {
-    case 1:
-      balance=usr.withdraw(balance);
-      break;
-    case 2:
-      balance=usr.deposit(balance);
-      break;
-    case 3:
-      balance=usr.transfer(balance);
-      break;
-    case 4:
-      balance=usr.balance(balance);
-      break;
-    case 5:
-      usr.quit();
-      break;
-    default:
-      System.out.println("Invalid choice!");
-      functionalities();
+    String name;
+    String userID;
+    String password;
+    String act_no;
+    float bal=0f;
+    int trans=0;
+    String transHis="";
+    Scanner sc=new Scanner(System.in);
+    DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    LocalDateTime now =LocalDateTime.now();
+    public void register(){
+        System.out.println("\nCREATE USER NAME:");
+        this.userID=sc.nextLine();
+        System.out.println("CREATE PASSWORD:");
+        this.password=sc.nextLine();
+        System.out.println("ENTER ACCOUNT NO.:");
+        this.act_no=sc.nextLine();
+        System.out.println("Registered Successfully!!");
+        System.out.println("Login to continue.");
     }
-  }
-  public int withdraw(int b) {
-    balance=b;
-    System.out.println("Enter the amount to withdraw");
-    int wd=input.nextInt();
-    try {
-    if(wd>balance) {
-      System.out.println("Insufficient balance ");
+    public boolean login(){
+        boolean isLogin=false;
+        while(!isLogin){
+            System.out.println("\nEnter username : ");
+            String usr=sc.nextLine();
+            if (usr.equals(userID)){
+                System.out.println("Enter password : ");
+                String pd=sc.nextLine();
+                while(!isLogin){
+                    if(pd.equals(password)){
+                        System.out.println(" Login Successfully");
+                        isLogin=true;
+                    }
+                    else{
+                        System.out.println("Invalid login!!");
+                        break;
+                    }
+                }
+            }
+            else{
+                System.out.println("Username not found!!");
+            }
+        }
+        return isLogin;
     }
-    else if(wd<=balance) {
-      balance=balance-wd;
-      System.out.println("Withdraw successful at "+ctime);
+    public void deposit(){
+        System.out.println("\nEnter amount to deposit : ");
+        float damount=sc.nextFloat();
+        try{
+            if(damount<=100000f){
+                bal+=damount;
+                trans+=1;
+                System.out.println("Successfully deposited Rs. "+damount+" at "+dtf.format(now));
+                String s="Rs "+damount+" deposited at "+dtf.format(now)+" .\n";
+                transHis=transHis.concat(s);
+            }
+            else{
+                System.out.println("Sorry!Can't deposit more than 50,000");
+            }
+        }
+        catch(Exception e){
+        }
     }
-    }catch(Exception e) {
-      
+    public void withdraw(){
+        System.out.println("\nEnter amount you wish to withdraw : ");
+        float wamount=sc.nextFloat();
+        try{
+            if (wamount<=bal){
+                bal-=wamount;
+                trans+=1;
+                System.out.println("Successfully withdrawn Rs. "+wamount+" at "+dtf.format(now));
+                String s="Rs "+wamount+" withdrawn at "+dtf.format(now)+" .\n";
+                transHis=transHis.concat(s);
+            }
+            else{
+                System.out.println("Insufficient amount to withdraw....");
+            }
+        }
+        catch(Exception e){
+        }
     }
-    functionalities();
-    return balance;
-  }
-  public int deposit(int b) {
-    balance=b;
-    System.out.println("Enter the amount you wish to deposit");
-    int dp=input.nextInt();
-    try {
-    if(dp<50000) {
-    balance=balance+dp;
-    System.out.println("Deposit Sucessfull at "+ctime );
-    System.out.println("current balance is"+balance);
+    public void transfer(){
+      Scanner in=new Scanner(System.in);
+        System.out.println("\nEnter the username to transfer: ");
+        String uname=in.nextLine();
+        System.out.println("Enter the amount to transfer");
+        float tamount=sc.nextFloat();
+        try{
+            if (tamount<=bal){
+                bal-=tamount;
+                trans+=1;
+                System.out.println("Successfully transferred Rs. "+tamount+" at "+dtf.format(now));
+                String s="Rs "+tamount+" transferred to "+uname+" account at "+dtf.format(now)+" .\n";
+                transHis=transHis.concat(s);
+            }
+            else{
+                System.out.println("Sorry!Insufficient amount.Unable to transfer");
+            }
+        }   
+        catch(Exception e){
+        }
     }
-    else {
-      System.out.println("Can't deposit more than 50,000");
+    public void transHistory(){
+        if(trans==0){
+            System.out.println("\nNo Transactions!!");
+        }
+        else{
+            System.out.println("\n"+transHis);
+        }
     }
-    }catch(Exception e) {
-      
+    public void checkBal(){
+        System.out.println("\nBalance: "+bal);
     }
-    functionalities();
-    return balance;
-  }
-  public int transfer(int b) {
-    balance=b;
-    String toacc;
-    int tamount;
-    System.out.println("Enter the user you want to transfer amount");
-    toacc=input.next();
-    System.out.println("Enter the amount to transfer");
-    tamount=input.nextInt();
-    try {
-    balance=balance-tamount;
-    System.out.println("Transaction successful");
-    }catch(Exception e) {
-      
+    public static void main(String args[]){
+        System.out.println("<---WELCOME TO ATM--->");
+        System.out.println("Choose any option!");
+        System.out.println("1.REGISTER\n2.EXIT");
+        System.out.println("Enter your option :");
+        Scanner sc=new Scanner(System.in);
+        int ch;
+        ch=sc.nextInt();
+        if (ch==1){
+            MyAtm acc=new MyAtm();
+            acc.register();
+            while(ch==1){
+                System.out.println("\nSelect any option!");
+                System.out.println("1.LOGIN\n2.EXIT");
+                System.out.println("Enter your option :");
+                int op=sc.nextInt();
+                if (op==1){
+                    if(acc.login()){
+                        boolean isFin=false;
+                        while(!isFin){
+                            System.out.println("\nSelect any option : ");
+                            System.out.println("1.DEPOSIT\n2.WITHDRAW\n3.TRANSFER\n4.TRANSACTION HISTORY\n5.CHECK BALANCE\n6.EXIT");
+                            System.out.println("Enter your option :");
+                            int c=sc.nextInt();
+                            switch(c){
+                                case 1 : acc.deposit();
+                                         break;
+                                case 2 : acc.withdraw();
+                                         break;
+                                case 3 : acc.transfer();
+                                         break;
+                                case 4 : acc.transHistory();
+                                         break;
+                                case 5 : acc.checkBal();
+                                         break;
+                                case 6 : isFin=true;
+                                         break;
+                                default: System.out.println("Invalid option!");
+                            }
+                        }
+                    }
+                }
+                else{
+                    System.exit(0);
+                }
+            }
+        }
+        else{
+            System.exit(0);
+        }
     }
-    functionalities();
-    return balance;
-  }
-  public int balance(int b) {
-    balance=b;
-    System.out.println("current balance is"+balance);
-    functionalities();
-    return balance;
-  }
-  public void quit() {
-    System.out.println("Thank you!! Have a great day");
-  }
-}
-
- 
-public class Login extends MyAtm{
-  Scanner input=new Scanner(System.in);
-  DecimalFormat money=new DecimalFormat("'$'###,##0.00");
-  HashMap <String,Integer> data=new HashMap<String,Integer>();
-  MyAtm usr=new MyAtm();
-  String user;
-  int pin;
-  public int logmeth() {
-    int x=1;
-    do {
-      try {
-      data.put("amaya", 1920);
-      data.put("mantu", 1999);
-      System.out.println(".....WELCOME TO ATM.....");
-      System.out.println("Enter user name..");
-      String usr=this.user=input.next();
-      System.out.println("Enter your pin..");
-      this.pin=input.nextInt();
-      }catch(Exception e) {
-        System.out.println("Invalid");
-        x=2;
-      }
-      if(data.containsKey(this.user)&& data.get(this.user)==this.pin){
-        System.out.println("Valid login.."+" "+"You can now perform your transactions");
-        usr.functionalities();
-      }else {
-        System.out.println("Invalid Login");
-      }
-  }while(x==1);
-  return 0;
-  }
-}
-public class Atm{
-  public static void main(String args[]) {
-    Login ob=new Login();
-    ob.logmeth();
-  }
 }
